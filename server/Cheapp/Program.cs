@@ -1,22 +1,23 @@
 using AspNetCore.Identity.Mongo;
 using AspNetCore.Identity.Mongo.Model;
+using Cheapp.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-/*builder.Services.AddIdentityMongoDbProvider<MongoUser>(identity =>
+builder.Services.AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(identity =>
 {
     identity.Password.RequiredLength = 8;
-    identity.Password.RequireDigit = true;
+    identity.Password.RequireDigit = false;
     // other options
 },
    mongo =>
    {
        mongo.ConnectionString = builder.Configuration["MongoDB:ConnectionString"]; ;
        // other options
-   });*/
+   });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
