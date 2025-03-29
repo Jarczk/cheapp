@@ -48,7 +48,7 @@ cheapp/
 
 ### Requirements
 
-1. **.NET 6.0+** (or the version you’re targeting)
+1. **.NET 8.0+**
 2. **Node.js 14+** (or latest LTS)
 3. **MongoDB** (local or remote instance)
 
@@ -62,7 +62,7 @@ cheapp/
 
 2. **.NET project setup**:
    ```bash
-   cd server
+   cd server/Cheapp
    dotnet restore
    # Add any environment-specific settings in appsettings.json or user secrets
    cd ..
@@ -86,7 +86,7 @@ Below are examples of how to run both the backend and frontend for local develop
 
 ### Start the Backend (ASP.NET Web API)
 ```bash
-cd server
+cd server/Cheapp
 dotnet run
 ```
 - The server will typically be available at `https://localhost:5001` or `http://localhost:5000` (depending on your .NET configuration).
@@ -115,11 +115,11 @@ npm start
 
 ## Contributors
 
- * Jarczk
- * WW
- * PP
+ * [Jarczk](https://github.com/Jarczk)
+ * [waldziorr](https://github.com/Waldziorr)
+ * (waiting)
 
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE)
+This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License)

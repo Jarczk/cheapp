@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddIdentityMongoDbProvider<MongoUser>(identity =>
+/*builder.Services.AddIdentityMongoDbProvider<MongoUser>(identity =>
 {
     identity.Password.RequiredLength = 8;
     identity.Password.RequireDigit = true;
@@ -14,9 +14,9 @@ builder.Services.AddIdentityMongoDbProvider<MongoUser>(identity =>
 },
    mongo =>
    {
-       mongo.ConnectionString = "mongodb://127.0.0.1:27017/CheappDb";
+       mongo.ConnectionString = builder.Configuration["MongoDB:ConnectionString"]; ;
        // other options
-   });
+   });*/
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
