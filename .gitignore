@@ -8,47 +8,47 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+server/Cheapp/[Dd]ebug/
+server/Cheapp/[Dd]ebugPublic/
+server/Cheapp/[Rr]elease/
+server/Cheapp/[Rr]eleases/
+server/Cheapp/x64/
+server/Cheapp/x86/
+server/Cheapp/[Ww][Ii][Nn]32/
+server/Cheapp/[Aa][Rr][Mm]/
+server/Cheapp/[Aa][Rr][Mm]64/
+server/Cheapp/bld/
+server/Cheapp/[Bb]in/
+server/Cheapp/[Oo]bj/
+server/Cheapp/[Ll]og/
+server/Cheapp/[Ll]ogs/
 
 # .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
+server/Cheapp/project.lock.json
+server/Cheapp/project.fragment.lock.json
+server/Cheapp/artifacts/
 
 # ASP.NET Scaffolding
-ScaffoldingReadMe.txt
+server/Cheapp/ScaffoldingReadMe.txt
 
 # NuGet Packages
-*.nupkg
+server/Cheapp/*.nupkg
 # NuGet Symbol Packages
-*.snupkg
+server/Cheapp/*.snupkg
 
 # Others
-~$*
-*~
-CodeCoverage/
+server/Cheapp/~$*
+server/Cheapp/*~
+server/Cheapp/CodeCoverage/
 
 # MSBuild Binary and Structured Log
-*.binlog
+server/Cheapp/*.binlog
 
 # MSTest test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
+server/Cheapp/[Tt]est[Rr]esult*/
+server/Cheapp/[Bb]uild[Ll]og.*
 
 # NUnit
-*.VisualState.xml
-TestResult.xml
-nunit-*.xml
+server/Cheapp/*.VisualState.xml
+server/Cheapp/TestResult.xml
+server/Cheapp/nunit-*.xml

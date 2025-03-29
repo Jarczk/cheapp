@@ -1,0 +1,6 @@
+@Cheapp_HostAddress = http://localhost:5166
+
+GET {{Cheapp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
