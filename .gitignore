@@ -539,7 +539,7 @@ client/.env.local
 # parcel-bundler cache (https://parceljs.org/)
 client/.cache
 client/.parcel-cache
-client/
+
 # Next.js build output
 client/.next
 client/out
