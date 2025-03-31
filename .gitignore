@@ -454,6 +454,8 @@ server/Cheapp/*.msp
 # JetBrains Rider
 server/Cheapp/*.sln.iml
 
+server/Cheapp/.env
+
 
 # Logs
 client/logs

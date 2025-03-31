@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize] //[Authorize(Roles = "Admin")] - for admin access only
 public class ProductsController : ControllerBase
 {
     [HttpGet]

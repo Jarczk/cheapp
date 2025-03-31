@@ -41,7 +41,28 @@ namespace Cheapp.Controllers
                 return BadRequest(result.Errors);
             }
 
+            await _userManager.AddToRoleAsync(user, "User");
+
             return Ok("User registered successfully");
+        }
+
+        [HttpPost("register-admin")]
+        public async Task<IActionResult> RegisterAdmin(RegisterDto model)
+        {
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            await _userManager.AddToRoleAsync(user, "Admin");
+
+            return Ok("Admin user registered successfully.");
         }
 
         [HttpPost("login")]
@@ -58,20 +79,20 @@ namespace Cheapp.Controllers
             return Ok(new { access_token = token });
         }
 
-        private string GenerateJwtToken(ApplicationUser user)
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var claims = new List<Claim>
-        {
-            //new Claim(JwtRegisteredClaimNames.Sub, user.Id), // sub = subject
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            new Claim(ClaimTypes.Name, user.UserName ?? "")
-        };
+            {
+                //new Claim(JwtRegisteredClaimNames.Sub, user.Id), // sub = subject
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+                new Claim(ClaimTypes.Name, user.UserName ?? "")
+            };
 
-            /*var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
-            }*/
+            }
 
             // Download key from config
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

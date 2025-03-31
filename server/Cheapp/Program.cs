@@ -6,8 +6,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using dotenv.net;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnv.Load();
+
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+if (string.IsNullOrEmpty(jwtKey))
+{
+    jwtKey = "superSecretKeyOnlyForLocalDev";
+}
 
 // Add services to the container.
 builder.Services.AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(identity =>
@@ -30,7 +40,6 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
-        // Parametry walidacji tokenów
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -39,7 +48,7 @@ builder.Services
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
