@@ -117,7 +117,7 @@ npm start
 
  * [Jarczk](https://github.com/Jarczk)
  * [waldziorr](https://github.com/Waldziorr)
- * (waiting)
+ * [sQnuf](https://github.com/sQnuf)
 
 
 ## License
