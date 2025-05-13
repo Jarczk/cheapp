@@ -1,4 +1,4 @@
-using AspNetCore.Identity.Mongo;
+﻿using AspNetCore.Identity.Mongo;
 using AspNetCore.Identity.Mongo.Model;
 using Cheapp.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -7,17 +7,24 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using dotenv.net;
+using DotNetEnv;
+using Cheapp.Options;
+using Cheapp.Services;
+using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 
+Env.Load();
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
-DotEnv.Load();
 
-var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+/*var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
 if (string.IsNullOrEmpty(jwtKey))
 {
     jwtKey = "superSecretKeyOnlyForLocalDev";
-}
+}*/
+
 
 // Add services to the container.
 builder.Services.AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(identity =>
@@ -32,25 +39,89 @@ builder.Services.AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(id
        // other options
    });
 
-builder.Services
-    .AddAuthentication(options =>
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+var jwtOpts = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()
+             ?? throw new InvalidOperationException("Jwt section missing");
+
+if (string.IsNullOrWhiteSpace(jwtOpts.Key))
+    throw new InvalidOperationException("Jwt:Key cannot be empty");
+
+if (Encoding.UTF8.GetByteCount(jwtOpts.Key) < 32)
+    throw new InvalidOperationException("Jwt:Key must be ≥ 32 bytes (256 bits) for HS256");
+
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOpts.Key));
+
+builder.Services.AddAuthentication(opts =>
+{
+    opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(opts =>
+{
+    opts.RequireHttpsMetadata = false;
+    opts.SaveToken = true;
+    opts.TokenValidationParameters = new TokenValidationParameters
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtOpts.Issuer,
+        ValidAudience = jwtOpts.Audience,
+        IssuerSigningKey = key
+    };
+});
+
+
+builder.Services.Configure<EbayOptions>(builder.Configuration.GetSection("Ebay"));
+builder.Services.Configure<GroqOptions>(builder.Configuration.GetSection("Groq"));
+builder.Services.Configure<MongoOptions>(builder.Configuration.GetSection("MongoDB"));
+
+// eBay OAuth
+builder.Services.AddHttpClient("EbayAuth", c =>
+{
+    c.BaseAddress = new Uri("https://api.sandbox.ebay.com/");
+});
+
+builder.Services.AddSingleton<IEbayOAuthService, EbayOAuthService>();
+builder.Services.AddTransient<EbayAuthHandler>();
+
+builder.Services.AddHttpClient<IEbayClient, EbayClient>((sp, c) =>
+{
+    var opt = sp.GetRequiredService<IOptions<EbayOptions>>().Value;
+    c.BaseAddress = new Uri(opt.BaseUrl);
+    c.DefaultRequestHeaders.Add("X-EBAY-C-MARKETPLACE-ID", opt.Marketplace);
+})
+.AddHttpMessageHandler<EbayAuthHandler>();
+
+builder.Services.AddHostedService<EbayTokenWarmup>();
+
+// MongoDB
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var opt = sp.GetRequiredService<IOptions<MongoOptions>>().Value;
+    return new MongoClient(opt.ConnectionString);
+});
+builder.Services.AddScoped<IMongoDatabase>(sp =>
+{
+    var opt = sp.GetRequiredService<IOptions<MongoOptions>>().Value;
+    return sp.GetRequiredService<IMongoClient>().GetDatabase(opt.Database);
+});
+
+// HTTP clients
+builder.Services.AddHttpClient<IAssistantClient, GroqAssistantClient>((sp, c) =>
+{
+    var opt = sp.GetRequiredService<IOptions<GroqOptions>>().Value;
+    c.BaseAddress = new Uri(opt.BaseUrl);
+    c.DefaultRequestHeaders.Add("Authorization", $"Bearer {opt.ApiKey}");
+});
+
+
+
+// domain services
+builder.Services.AddScoped<IOfferAggregator, OfferAggregator>();
+builder.Services.AddScoped<IConversationService, ConversationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -74,3 +145,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public record JwtOptions
+{
+    public string Key { get; init; } = string.Empty;
+    public string Issuer { get; init; } = string.Empty;
+    public string Audience { get; init; } = string.Empty;
+}

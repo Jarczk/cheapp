@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace Cheapp.Controllers
 {
@@ -12,17 +13,15 @@ namespace Cheapp.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly JwtOptions _jwt;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<ApplicationUser> userManager,
-                              SignInManager<ApplicationUser> signInManager,
-                              IConfiguration configuration)
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            IOptions<JwtOptions> jwt)            // <-- tu!
         {
             _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
+            _jwt = jwt.Value ?? throw new InvalidOperationException("Jwt section missing");
         }
 
         [HttpPost("register")]
@@ -79,36 +78,30 @@ namespace Cheapp.Controllers
             return Ok(new { access_token = token });
         }
 
-        private async Task<string> GenerateJwtToken(ApplicationUser user)
+        private string GenerateJwtToken(ApplicationUser user)
         {
-            var claims = new List<Claim>
-            {
-                //new Claim(JwtRegisteredClaimNames.Sub, user.Id), // sub = subject
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-                new Claim(ClaimTypes.Name, user.UserName ?? "")
-            };
+            if (string.IsNullOrWhiteSpace(_jwt.Key))
+                throw new InvalidOperationException("Jwt:Key not configured");
 
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            // Download key from config
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // Creating token object
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!)
+            };
+
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _jwt.Issuer,
+                audience: _jwt.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // token will expire after 1 hour
-                signingCredentials: creds
-            );
+                expires: DateTime.UtcNow.AddHours(12),
+                signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }
 
