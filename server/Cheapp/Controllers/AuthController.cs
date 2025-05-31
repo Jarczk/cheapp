@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
 namespace Cheapp.Controllers
 {
@@ -25,7 +26,7 @@ namespace Cheapp.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
             // Creating user in MongoDb
             var user = new ApplicationUser
@@ -40,7 +41,7 @@ namespace Cheapp.Controllers
                 return BadRequest(result.Errors);
             }
 
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "user");
 
             return Ok("User registered successfully");
         }
@@ -65,16 +66,23 @@ namespace Cheapp.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto model)
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
+            if (string.IsNullOrEmpty(model.Email)) 
+                return BadRequest("Email is required");
+            
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return Unauthorized("Invalid credentials");
-
+            if (user == null) 
+                return Unauthorized("Email not found"); // More specific
+            
+            if (string.IsNullOrEmpty(model.Password))
+                return BadRequest("Password is required");
+            
             var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
-            if (!passwordValid) return Unauthorized("Invalid credentials");
-
+            if (!passwordValid) 
+                return Unauthorized("Incorrect password"); // More specific
+            
             var token = GenerateJwtToken(user);
-
             return Ok(new { access_token = token });
         }
 
@@ -107,11 +115,17 @@ namespace Cheapp.Controllers
 
 public class RegisterDto
 {
+    [Required]
     public string Email { get; set; }
+
+    [Required]
     public string Password { get; set; }
 }
 public class LoginDto
 {
+    [Required]
     public string Email { get; set; }
+
+    [Required]
     public string Password { get; set; }
 }

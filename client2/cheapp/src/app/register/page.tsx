@@ -4,48 +4,42 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
-  setError('');
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-  try {
-    const response = await fetch('http://localhost:5166/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        Email: email.trim().toLowerCase(),
-        Password: password
-      }),
-    });
+    try {
+      const response = await fetch('http://localhost:5166/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      let errorData;
-      try { errorData = JSON.parse(errorText); } 
-      catch { errorData = { message: errorText || 'Login failed' }; }
-      throw new Error(errorData.Message || errorData.message);
+      const text = await response.text(); // zobacz co backend naprawdę zwraca
+      console.log('Odpowiedź serwera:', text);
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      router.push('/main');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
     }
-
-    const data = await response.json();
-    localStorage.setItem('token', data.access_token);
-    router.push('/main');
-  } catch (err) {
-    console.error('Login error:', err);
-    setError(err instanceof Error ? err.message : 'Login failed');
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Create your account
         </h2>
       </div>
 
@@ -79,7 +73,7 @@ const handleSubmit = async (e: FormEvent) => {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -99,7 +93,7 @@ const handleSubmit = async (e: FormEvent) => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Sign in
+                Register
               </button>
             </div>
           </form>
@@ -108,9 +102,9 @@ const handleSubmit = async (e: FormEvent) => {
             <div className="relative">
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
-                  Don't have an account?{' '}
-                  <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                    Register
+                  Already have an account?{' '}
+                  <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                    Sign in
                   </Link>
                 </span>
               </div>

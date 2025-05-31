@@ -36,7 +36,8 @@ builder.Services.AddIdentityMongoDbProvider<ApplicationUser, ApplicationRole>(id
    mongo =>
    {
        mongo.ConnectionString = builder.Configuration["MongoDB:ConnectionString"]; ;
-       // other options
+       mongo.UsersCollection = "Users";
+       mongo.RolesCollection = "Roles";
    });
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
@@ -117,8 +118,6 @@ builder.Services.AddHttpClient<IAssistantClient, GroqAssistantClient>((sp, c) =>
     c.DefaultRequestHeaders.Add("Authorization", $"Bearer {opt.ApiKey}");
 });
 
-
-
 // domain services
 builder.Services.AddScoped<IOfferAggregator, OfferAggregator>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
@@ -127,6 +126,17 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -137,12 +147,31 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    var roles = new[] { "User", "Admin" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new ApplicationRole { Name = role });
+        }
+    }
+}
 
 app.Run();
 
