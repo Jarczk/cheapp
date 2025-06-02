@@ -34,6 +34,7 @@ const handleSubmit = async (e: FormEvent) => {
 
     const data = await response.json();
     localStorage.setItem('token', data.access_token);
+    localStorage.setItem('userEmail', email.trim().toLowerCase());
     router.push('/main');
   } catch (err) {
     console.error('Login error:', err);

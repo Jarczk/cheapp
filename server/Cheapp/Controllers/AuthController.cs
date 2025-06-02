@@ -73,17 +73,33 @@ namespace Cheapp.Controllers
             
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null) 
-                return Unauthorized("Email not found"); // More specific
+                return Unauthorized("Email not found");
             
             if (string.IsNullOrEmpty(model.Password))
                 return BadRequest("Password is required");
             
             var passwordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordValid) 
-                return Unauthorized("Incorrect password"); // More specific
+                return Unauthorized("Incorrect password");
             
             var token = GenerateJwtToken(user);
             return Ok(new { access_token = token });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    await _userManager.UpdateSecurityStampAsync(user);
+                }
+            }
+            return Ok(new { message = "Logout successful" });
         }
 
         private string GenerateJwtToken(ApplicationUser user)

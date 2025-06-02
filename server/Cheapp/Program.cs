@@ -74,7 +74,6 @@ builder.Services.AddAuthentication(opts =>
     };
 });
 
-
 builder.Services.Configure<EbayOptions>(builder.Configuration.GetSection("Ebay"));
 builder.Services.Configure<GroqOptions>(builder.Configuration.GetSection("Groq"));
 builder.Services.Configure<MongoOptions>(builder.Configuration.GetSection("MongoDB"));
@@ -172,6 +171,22 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+
+//remove all from mongoDB
+// using (var scope = app.Services.CreateScope())
+// {
+//     try
+//     {
+//         var mongoClient = scope.ServiceProvider.GetRequiredService<IMongoClient>();
+//         var mongoOptions = scope.ServiceProvider.GetRequiredService<IOptions<MongoOptions>>().Value;
+//         await mongoClient.DropDatabaseAsync(mongoOptions.Database);
+//         Console.WriteLine("Database cleared successfully");
+//     }
+//     catch (Exception ex)
+//     {
+//         Console.WriteLine($"Error clearing database: {ex.Message}");
+//     }
+// }
 
 app.Run();
 

@@ -21,14 +21,12 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const text = await response.text(); // zobacz co backend naprawdę zwraca
-      console.log('Odpowiedź serwera:', text);
-
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || 'Registration failed');
       }
 
+      localStorage.setItem('userEmail', email.trim().toLowerCase());
       router.push('/main');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
