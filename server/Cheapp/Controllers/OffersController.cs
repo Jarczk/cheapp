@@ -11,13 +11,29 @@ namespace Cheapp.Controllers;
 public class OffersController : ControllerBase
 {
     private readonly IOfferAggregator _agg;
-    public OffersController(IOfferAggregator agg) => _agg = agg;
+    private readonly ISearchHistoryService _searchHistory;
+
+    public OffersController(IOfferAggregator agg, ISearchHistoryService searchHistory)
+    {
+        _agg = agg;
+        _searchHistory = searchHistory;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Offer>>> Get([FromQuery] string q, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(q)) return BadRequest("Query cannot be empty");
         var res = await _agg.GetBestAsync(q, ct);
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await _searchHistory.AddSearchAsync(userId, q, res.Count(), ct);
+            }
+        }
+
         return Ok(res);
     }
 }

@@ -122,6 +122,9 @@ builder.Services.AddHttpClient<IAssistantClient, GroqAssistantClient>((sp, c) =>
 builder.Services.AddScoped<IOfferAggregator, OfferAggregator>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 
+builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
+builder.Services.AddScoped<IFavoritesService, FavoritesService>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
