@@ -1,8 +1,10 @@
+// Updated OffersController.cs
 using Cheapp.Models;
 using Cheapp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Cheapp.Controllers;
 
@@ -27,13 +29,13 @@ public class OffersController : ControllerBase
 
         if (User.Identity?.IsAuthenticated == true)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Changed from ClaimTypes.NameIdentifier to JwtRegisteredClaimNames.Sub
+            var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
             if (!string.IsNullOrEmpty(userId))
             {
                 await _searchHistory.AddSearchAsync(userId, q, res.Count(), ct);
             }
         }
-
         return Ok(res);
     }
 }

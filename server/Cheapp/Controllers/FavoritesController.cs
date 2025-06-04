@@ -3,12 +3,13 @@ using Cheapp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Cheapp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // This ensures all endpoints require authentication
+
 public class FavoritesController : ControllerBase
 {
     private readonly IFavoritesService _favorites;
@@ -25,8 +26,6 @@ public class FavoritesController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         
-        // Since [Authorize] is on the controller, this should never be null
-        // But let's be safe and handle it anyway
         if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized("User ID not found in token");
@@ -46,8 +45,6 @@ public class FavoritesController : ControllerBase
             return Unauthorized("User ID not found in token");
         }
         
-        // For now, we'll create an offer from the OfferId
-        // In a real implementation, you'd fetch the full offer details
         var offer = new Offer { Id = dto.OfferId };
         
         var favoriteId = await _favorites.AddFavoriteAsync(userId, offer, dto.Notes, ct);
@@ -124,13 +121,13 @@ public class FavoritesController : ControllerBase
 
     private async Task<Offer?> GetOfferById(string offerId, CancellationToken ct)
     {
-        // This is a placeholder - implement based on how you store/retrieve offers
-        // You might need to add this method to your IOfferAggregator interface
         throw new NotImplementedException("Implement offer retrieval by ID");
     }
 }
 
-// Move these to a separate file or Models folder
+
+
+
 public record AddFavoriteFromOfferDto(Offer Offer, string? Notes);
 public record AddFavoriteDto(string OfferId, string? Notes);
 public record UpdateFavoriteNotesDto(string Notes);
