@@ -30,6 +30,7 @@ public class EbayClient : IEbayClient
     {
         Id = x.ItemId,
         Marketplace = "EBAY_DE",
+        ImageUrl = x.Image.ImageUrl,
         Title = x.Title,
         Price = x.Price.Value,
         Currency = x.Price.Currency,
@@ -44,6 +45,8 @@ public class EbayClient : IEbayClient
         public string Title  { get; set; } = string.Empty;
         public PriceObj Price{ get; set; } = new();
         public string ItemWebUrl { get; set; } = string.Empty;
+        public ImageObj Image { get; set; } = new();
     }
     private sealed class PriceObj { public decimal Value { get; set; } public string Currency { get; set; } = "USD"; }
+    private sealed class ImageObj { public int Height { get; set; } public string ImageUrl { get; set; } = ""; public int width { get; set; } }
 }
