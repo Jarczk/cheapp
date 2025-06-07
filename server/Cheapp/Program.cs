@@ -132,7 +132,7 @@ builder.Services.AddSwaggerGen(c =>
     var jwtScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Description = "Podaj **Bearer &lt;twój_JWT&gt;**",
+        Description = "Podaj **&lt;access_token&gt;**",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
