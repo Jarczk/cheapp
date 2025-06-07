@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cheapp.Controllers
 {
@@ -102,6 +103,17 @@ namespace Cheapp.Controllers
             return Ok(new { message = "Logout successful" });
         }
 
+        [HttpGet("whoami")]
+        [Authorize]
+        public IActionResult WhoAmI()
+        {
+            return Ok(new
+            {
+                uid = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                email = User.Identity?.Name
+            });
+        }
+
         private string GenerateJwtToken(ApplicationUser user)
         {
             if (string.IsNullOrWhiteSpace(_jwt.Key))
@@ -109,7 +121,6 @@ namespace Cheapp.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),

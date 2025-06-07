@@ -26,7 +26,7 @@ public class AssistantController : ControllerBase
         var sessionId = string.IsNullOrEmpty(dto.SessionId) ? await _conv.NewSessionAsync(uid, ct) : dto.SessionId!;
         await _conv.AppendAsync(sessionId, "user", dto.Prompt, ct);
 
-        var answer = await _ai.AskAsync(dto.Prompt, null, ct);
+        var answer = await _ai.AskAsync(dto.Prompt, dto.SystemPrompt, ct);
         await _conv.AppendAsync(sessionId, "assistant", answer, ct);
 
         return Ok(new { sessionId, answer });
@@ -37,5 +37,5 @@ public class AssistantController : ControllerBase
     public async Task<ActionResult<IEnumerable<ChatMessage>>> History(string sessionId, CancellationToken ct)
         => Ok(await _conv.GetMessagesAsync(sessionId, ct));
 
-    public record AskDto(string Prompt, string? SessionId);
+    public record AskDto(string Prompt, string? SystemPrompt, string? SessionId);
 }

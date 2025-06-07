@@ -37,7 +37,7 @@ public class GroqAssistantClient : IAssistantClient
 
     public async Task<string> AskAsync(
         string prompt,
-        string? systemPrompt = "Jesteś pomocnym asystentem sklepowym. Masz pomóc w wyborze produktu.",
+        string? systemPrompt = "Jesteś pomocnym asystentem sklepowym. Masz pomóc w wyborze produktu. Staraj się odpowiadać krótko i konkretnie. Nie rozpisuj się tylko szybko próbuj znaleźć produkt którego użytkownik szuka.",
         CancellationToken ct = default)
     {
         var messages = new List<ChatMessage>();
@@ -53,6 +53,10 @@ public class GroqAssistantClient : IAssistantClient
             Messages: messages,
             MaxTokens: 500
         );
+
+
+        Console.WriteLine("🟢 PAYLOAD to Groq:\n" +
+            JsonSerializer.Serialize(req, new JsonSerializerOptions { WriteIndented = true }));
 
         using var res = await _http.PostAsJsonAsync(
             "chat/completions", req, _json, ct);
