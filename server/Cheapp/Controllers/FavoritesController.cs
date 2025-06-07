@@ -3,145 +3,102 @@ using Cheapp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
+using System.ComponentModel.DataAnnotations;
 
-namespace Cheapp.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-
-public class FavoritesController : ControllerBase
+namespace Cheapp.Controllers
 {
-    private readonly IFavoritesService _favorites;
-    private readonly IOfferAggregator _offerAggregator;
-
-    public FavoritesController(IFavoritesService favorites, IOfferAggregator offerAggregator)
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    public class FavoritesController : ControllerBase
     {
-        _favorites = favorites;
-        _offerAggregator = offerAggregator;
-    }
+        private readonly IFavoritesService _favoritesService;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<FavoriteResponse>>> GetFavorites(CancellationToken ct = default)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (string.IsNullOrEmpty(userId))
+        public FavoritesController(IFavoritesService favoritesService)
         {
-            return Unauthorized("User ID not found in token");
-        }
-        
-        var favorites = await _favorites.GetUserFavoritesAsync(userId, ct);
-        return Ok(favorites);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> AddFavorite([FromBody] AddFavoriteDto dto, CancellationToken ct = default)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("User ID not found in token");
-        }
-        
-        var offer = new Offer { Id = dto.OfferId };
-        
-        var favoriteId = await _favorites.AddFavoriteAsync(userId, offer, dto.Notes, ct);
-        return Ok(new { favoriteId, message = "Added to favorites successfully" });
-    }
-
-    [HttpPost("from-offer")]
-    public async Task<IActionResult> AddFavoriteFromOffer([FromBody] AddFavoriteFromOfferDto dto, CancellationToken ct = default)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("User ID not found in token");
-        }
-        
-        var favoriteId = await _favorites.AddFavoriteAsync(userId, dto.Offer, dto.Notes, ct);
-        return Ok(new { favoriteId, message = "Added to favorites successfully" });
-    }
-
-    [HttpDelete("{favoriteId}")]
-    public async Task<IActionResult> RemoveFavorite(string favoriteId, CancellationToken ct = default)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("User ID not found in token");
-        }
-        
-        var removed = await _favorites.RemoveFavoriteAsync(userId, favoriteId, ct);
-        
-        if (!removed)
-        {
-            return NotFound("Favorite not found");
+            _favoritesService = favoritesService;
         }
 
-        return Ok(new { message = "Removed from favorites successfully" });
-    }
+        [HttpPost]
+        public async Task<IActionResult> AddFavorite([FromBody] AddFavoriteRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
 
-    [HttpPut("{favoriteId}/notes")]
-    public async Task<IActionResult> UpdateNotes(string favoriteId, [FromBody] UpdateFavoriteNotesDto dto, CancellationToken ct = default)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("User ID not found in token");
-        }
-        
-        var updated = await _favorites.UpdateFavoriteNotesAsync(userId, favoriteId, dto.Notes, ct);
-        
-        if (!updated)
-        {
-            return NotFound("Favorite not found");
+            try
+            {
+                var favoriteId = await _favoritesService.AddFavoriteAsync(userId, request.ProductId);
+                return Ok(new { Id = favoriteId, Message = "Favorite added successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error adding favorite: {ex.Message}");
+            }
         }
 
-        return Ok(new { message = "Notes updated successfully" });
-    }
-
-    [HttpGet("check/{offerId}")]
-    public async Task<ActionResult<bool>> IsFavorite(string offerId, CancellationToken ct = default)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (string.IsNullOrEmpty(userId))
+        [HttpGet]
+        public async Task<IActionResult> GetFavorites()
         {
-            return Unauthorized("User ID not found in token");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var favorites = await _favoritesService.GetUserFavoritesAsync(userId);
+                return Ok(favorites);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error retrieving favorites: {ex.Message}");
+            }
         }
-        
-        var isFavorite = await _favorites.IsFavoriteAsync(userId, offerId, ct);
-        return Ok(new { isFavorite });
+
+        [HttpDelete("{favoriteId}")]
+        public async Task<IActionResult> RemoveFavorite(string favoriteId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var removed = await _favoritesService.RemoveFavoriteAsync(userId, favoriteId);
+                if (removed)
+                    return Ok(new { Message = "Favorite removed successfully" });
+                else
+                    return NotFound("Favorite not found");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error removing favorite: {ex.Message}");
+            }
+        }
+
+        [HttpGet("check/{productId}")]
+        public async Task<IActionResult> CheckIfFavorite(string productId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            try
+            {
+                var isFavorite = await _favoritesService.IsFavoriteAsync(userId, productId);
+                return Ok(new { IsFavorite = isFavorite });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error checking favorite: {ex.Message}");
+            }
+        }
     }
 
-    private async Task<Offer?> GetOfferById(string offerId, CancellationToken ct)
+    // Request DTOs
+    public class AddFavoriteRequest
     {
-        throw new NotImplementedException("Implement offer retrieval by ID");
+        [Required]
+        public string ProductId { get; set; } = string.Empty;
     }
-}
-
-
-
-
-public record AddFavoriteFromOfferDto(Offer Offer, string? Notes);
-public record AddFavoriteDto(string OfferId, string? Notes);
-public record UpdateFavoriteNotesDto(string Notes);
-
-public class FavoriteResponse
-{
-    public string Id { get; set; } = string.Empty;
-    public string OfferId { get; set; } = string.Empty;
-    public string ProductId { get; set; } = string.Empty;
-    public string Marketplace { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public string Currency { get; set; } = "USD";
-    public string Url { get; set; } = string.Empty;
-    public DateTime AddedAt { get; set; }
-    public string? Notes { get; set; }
 }
