@@ -113,8 +113,11 @@ class ApiClient {
   }
 
   async addToFavorites(productId: string): Promise<void> {
-    return this.request<void>(`/favorites/${productId}`, {
+    return this.request<void>('/favorites', {
       method: 'POST',
+      body: JSON.stringify({
+        productId: productId
+      }),
     })
   }
 
