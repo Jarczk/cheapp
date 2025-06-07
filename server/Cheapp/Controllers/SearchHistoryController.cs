@@ -3,7 +3,6 @@ using Cheapp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Cheapp.Controllers;
 
@@ -62,7 +61,8 @@ public class SearchHistoryController : ControllerBase
         await _searchHistory.DeleteSearchAsync(userId, searchId, ct);
         return Ok(new { message = "Search deleted successfully" });
     }
-}public class SearchHistoryResponse
+}
+public class SearchHistoryResponse
 {
     public string Id { get; set; } = string.Empty;
     public string Query { get; set; } = string.Empty;
