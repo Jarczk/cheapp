@@ -110,6 +110,7 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
     return sp.GetRequiredService<IMongoClient>().GetDatabase(opt.Database);
 });
 
+
 // HTTP clients
 builder.Services.AddHttpClient<IAssistantClient, GroqAssistantClient>((sp, c) =>
 {
@@ -121,6 +122,9 @@ builder.Services.AddHttpClient<IAssistantClient, GroqAssistantClient>((sp, c) =>
 // domain services
 builder.Services.AddScoped<IOfferAggregator, OfferAggregator>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
+
+builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
+builder.Services.AddScoped<IFavoritesService, MongoFavoritesService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
