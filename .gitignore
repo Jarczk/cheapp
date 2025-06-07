@@ -737,3 +737,4 @@ client2/.yarn/install-state.gz
 client2/.pnp.*
 client2/yarn-debug.log*
 client2/yarn-error.log*
+.env
