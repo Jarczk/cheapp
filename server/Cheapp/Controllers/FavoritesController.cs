@@ -55,6 +55,17 @@ namespace Cheapp.Controllers
             }
         }
 
+        [HttpGet("full")]
+        public async Task<IActionResult> GetFavoriteOffers()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+    
+            var offers = await _favoritesService.GetUserFavoriteOffersAsync(userId);
+            return Ok(offers);
+        }
+
         [HttpDelete("{productId}")]
         public async Task<IActionResult> RemoveFavoriteByProductId(string productId)
         {

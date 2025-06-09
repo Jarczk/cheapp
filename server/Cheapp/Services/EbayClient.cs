@@ -1,10 +1,12 @@
 ﻿using Cheapp.Models;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 namespace Cheapp.Services;
 
 public interface IEbayClient
 {
     Task<IEnumerable<Offer>> SearchAsync(string query, CancellationToken ct = default);
+    Task<Offer?> GetByIdAsync(string itemId, CancellationToken ct = default);
 }
 
 public class EbayClient : IEbayClient
@@ -24,6 +26,33 @@ public class EbayClient : IEbayClient
         resp.EnsureSuccessStatusCode();
         var data = await resp.Content.ReadFromJsonAsync<EbayResp>(cancellationToken: ct);
         return data?.ItemSummaries?.Select(ToOffer) ?? Enumerable.Empty<Offer>();
+    }
+
+    public async Task<Offer?> GetByIdAsync(string itemId, CancellationToken ct = default)
+    {
+        var resp = await _http.GetAsync($"item/{itemId}", ct);
+        if (!resp.IsSuccessStatusCode) return null;
+
+        var dto = await resp.Content.ReadFromJsonAsync<ItemDto>(_jsonOpt, ct);
+        return dto == null ? null : new Offer
+        {
+            Id         = dto.ItemId,
+            Marketplace= "EBAY_US",
+            ImageUrl   = dto.Image.ImageUrl,
+            Title      = dto.Title,
+            Price      = dto.Price.Value,
+            Currency   = dto.Price.Currency,
+            Url        = dto.ItemWebUrl,
+            RetrievedAt= DateTime.UtcNow
+        };
+    }
+    private sealed class ItemDto
+    {
+        public string ItemId { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public PriceObj Price { get; set; } = new();
+        public string ItemWebUrl { get; set; } = string.Empty;
+        public ImageObj Image { get; set; } = new();
     }
 
     private static Offer ToOffer(ItemSummary x) => new()
@@ -47,6 +76,14 @@ public class EbayClient : IEbayClient
         public string ItemWebUrl { get; set; } = string.Empty;
         public ImageObj Image { get; set; } = new();
     }
-    private sealed class PriceObj { public decimal Value { get; set; } public string Currency { get; set; } = "USD"; }
+    private sealed class PriceObj
+    {
+        [JsonPropertyName("value")]
+        [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+        public decimal Value { get; set; }
+
+        [JsonPropertyName("currency")]
+        public string Currency { get; set; } = "USD";
+    }
     private sealed class ImageObj { public int Height { get; set; } public string ImageUrl { get; set; } = ""; public int width { get; set; } }
 }

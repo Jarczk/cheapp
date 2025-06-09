@@ -9,10 +9,12 @@ public class MongoFavoritesService : IFavoritesService
 {
     private readonly IMongoCollection<Favorite> _favoritesCollection;
     private readonly ILogger<MongoFavoritesService> _logger;
+    private readonly IEbayClient _ebayClient;
 
-    public MongoFavoritesService(IOptions<MongoOptions> mongoOptions, ILogger<MongoFavoritesService> logger)
+    public MongoFavoritesService(IOptions<MongoOptions> mongoOptions, ILogger<MongoFavoritesService> logger, IEbayClient ebayClient)
     {
         _logger = logger;
+        _ebayClient = ebayClient;
 
         try
         {
@@ -30,6 +32,8 @@ public class MongoFavoritesService : IFavoritesService
             _logger.LogError(ex, "Failed to connect to MongoDB");
             throw;
         }
+
+        _ebayClient = ebayClient;
     }
 
     private void CreateIndexes()
@@ -115,6 +119,18 @@ public class MongoFavoritesService : IFavoritesService
             _logger.LogError(ex, "Failed to get favorites for user {UserId}", userId);
             throw;
         }
+    }
+
+    public async Task<IEnumerable<Offer>> GetUserFavoriteOffersAsync(string userId, CancellationToken ct = default)
+    {
+        var favIds = await _favoritesCollection
+            .Find(f => f.UserId == userId)
+            .Project(f => f.ProductId)
+            .ToListAsync(ct);
+
+        var tasks = favIds.Select(id => _ebayClient.GetByIdAsync(id, ct));
+        var offers = await Task.WhenAll(tasks);
+        return offers.Where(o => o is not null)!;
     }
 
     public async Task<bool> RemoveFavoriteByProductIdAsync(string userId, string productId, CancellationToken ct = default)
