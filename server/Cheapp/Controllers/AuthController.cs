@@ -110,7 +110,7 @@ namespace Cheapp.Controllers
             return Ok(new
             {
                 uid = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                email = User.Identity?.Name
+                email = User.FindFirstValue(ClaimTypes.Email),
             });
         }
 
