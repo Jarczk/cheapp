@@ -29,7 +29,7 @@ public class EbayClient : IEbayClient
     private static Offer ToOffer(ItemSummary x) => new()
     {
         Id = x.ItemId,
-        Marketplace = "EBAY_DE",
+        Marketplace = "EBAY_US",
         ImageUrl = x.Image.ImageUrl,
         Title = x.Title,
         Price = x.Price.Value,
