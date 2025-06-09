@@ -55,8 +55,8 @@ namespace Cheapp.Controllers
             }
         }
 
-        [HttpDelete("{favoriteId}")]
-        public async Task<IActionResult> RemoveFavorite(string favoriteId)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> RemoveFavoriteByProductId(string productId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -64,7 +64,7 @@ namespace Cheapp.Controllers
 
             try
             {
-                var removed = await _favoritesService.RemoveFavoriteAsync(userId, favoriteId);
+                var removed = await _favoritesService.RemoveFavoriteByProductIdAsync(userId, productId);
                 if (removed)
                     return Ok(new { Message = "Favorite removed successfully" });
                 else

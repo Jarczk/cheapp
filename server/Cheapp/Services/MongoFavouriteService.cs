@@ -117,25 +117,15 @@ public class MongoFavoritesService : IFavoritesService
         }
     }
 
-    public async Task<bool> RemoveFavoriteAsync(string userId, string favoriteId, CancellationToken ct = default)
+    public async Task<bool> RemoveFavoriteByProductIdAsync(string userId, string productId, CancellationToken ct = default)
     {
-        _logger.LogInformation("Removing favorite {FavoriteId} for user {UserId}", favoriteId, userId);
-
-        try
-        {
-            var result = await _favoritesCollection.DeleteOneAsync(
-                f => f.Id == favoriteId && f.UserId == userId,
-                cancellationToken: ct);
-
-            bool success = result.DeletedCount > 0;
-            _logger.LogInformation("Remove favorite result: {Success}", success);
-            return success;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to remove favorite {FavoriteId} for user {UserId}", favoriteId, userId);
-            throw;
-        }
+        var filter = Builders<Favorite>.Filter.And(
+            Builders<Favorite>.Filter.Eq(f => f.UserId, userId),
+            Builders<Favorite>.Filter.Eq(f => f.ProductId, productId) // or f.OfferId depending on your model
+        );
+        
+        var result = await _favoritesCollection.DeleteOneAsync(filter, ct);
+        return result.DeletedCount > 0;
     }
 
     public async Task<bool> IsFavoriteAsync(string userId, string productId, CancellationToken ct = default)
