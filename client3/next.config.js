@@ -4,7 +4,16 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ['images.unsplash.com', 'via.placeholder.com', 'i.ebayimg.sandbox.ebay.com'],
+  remotePatterns: [
+    {
+      protocol: 'http',
+      hostname: '**',
+    },
+    {
+      protocol: 'https',
+      hostname: '**',
+    },
+  ],
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5166/api',
