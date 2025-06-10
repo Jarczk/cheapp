@@ -110,7 +110,7 @@ export default function ProductDetailPage() {
               <div className="relative aspect-square">
                 {!imageError ? (
                   <Image
-                    src={product.imageUrl || `https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=600&fit=crop&crop=center`}
+                    src={product.imageUrl || `https://nftcalendar.io/storage/uploads/2022/02/21/image-not-found_0221202211372462137974b6c1a.png`}
                     alt={product.title}
                     fill
                     className="object-cover"

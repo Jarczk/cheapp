@@ -105,13 +105,13 @@ export default function ProductsPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               <span className="text-sm text-muted-foreground mr-2">Try searching for:</span>
-              {["iPhone", "Laptop", "Headphones", "Gaming Chair"].map((term) => (
+              {["iPhone", "Laptop", "Fiat"].map((term) => (
                 <Button
                   key={term}
                   variant="outline"
                   size="sm"
                   onClick={() => setSearchQuery(term)}
-                  className="text-xs"
+                  className="text-xs -translate-y-[8px] relative"
                 >
                   {term}
                 </Button>
