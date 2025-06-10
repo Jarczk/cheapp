@@ -11,12 +11,9 @@ namespace Cheapp.Services;
 
 public interface IAssistantClient
 {
-    Task<string> AskAsync(string prompt, string? systemPrompt = null, CancellationToken ct = default);
+    Task<string> AskAsync(IEnumerable<Models.ChatMessage> history, string? systemPrompt = null, CancellationToken ct = default);
 }
 
-
-internal record ChatCompletionRequest(string Model, IEnumerable<Message> Messages, int Max_Tokens = 500);
-internal record Message(string Role, string Content);
 
 public class GroqAssistantClient : IAssistantClient
 {
@@ -36,7 +33,7 @@ public class GroqAssistantClient : IAssistantClient
     }
 
     public async Task<string> AskAsync(
-        string prompt,
+        IEnumerable<Models.ChatMessage> history,
         string? systemPrompt = "Jesteś pomocnym asystentem sklepowym. Masz pomóc w wyborze produktu. Staraj się odpowiadać krótko i konkretnie. Nie rozpisuj się tylko szybko próbuj znaleźć produkt którego użytkownik szuka.",
         CancellationToken ct = default)
     {
@@ -45,7 +42,8 @@ public class GroqAssistantClient : IAssistantClient
         if (!string.IsNullOrWhiteSpace(systemPrompt))
             messages.Add(new ChatMessage("system", systemPrompt));
 
-        messages.Add(new ChatMessage("user", prompt));
+        foreach (var m in history)
+            messages.Add(new ChatMessage(m.Role, m.Content));
 
         var req = new ChatCompletionRequest
         (

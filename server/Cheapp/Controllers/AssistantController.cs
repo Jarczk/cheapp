@@ -26,7 +26,8 @@ public class AssistantController : ControllerBase
         var sessionId = string.IsNullOrEmpty(dto.SessionId) ? await _conv.NewSessionAsync(uid, ct) : dto.SessionId!;
         await _conv.AppendAsync(sessionId, "user", dto.Prompt, ct);
 
-        var answer = await _ai.AskAsync(dto.Prompt, dto.SystemPrompt, ct);
+        var history = await _conv.GetMessagesAsync(sessionId, ct);
+        var answer = await _ai.AskAsync(history, dto.SystemPrompt, ct);
         await _conv.AppendAsync(sessionId, "assistant", answer, ct);
 
         return Ok(new { sessionId, answer });
