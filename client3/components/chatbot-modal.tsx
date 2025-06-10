@@ -17,7 +17,7 @@ export function ChatbotModal() {
   const [sessionId, setSessionId] = useState<string>()
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const sendMessage = useSendChatMessage()
-
+  
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
@@ -55,7 +55,7 @@ export function ChatbotModal() {
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.response,
+        content: response.answer,
         timestamp: new Date().toISOString(),
       }
 

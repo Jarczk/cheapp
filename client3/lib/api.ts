@@ -128,7 +128,7 @@ class ApiClient {
   }
 
   // Chat endpoints
-  async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
+  /*async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
     return this.request<ChatResponse>('/assistant/ask', {
       method: 'POST',
       body: JSON.stringify({
@@ -136,7 +136,18 @@ class ApiClient {
         SessionId: request.sessionId,
       }),
     })
+  }*/
+  async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
+    return this.request<ChatResponse>('/assistant/ask', {
+      method: 'POST',
+      body: JSON.stringify({
+        Prompt:    request.message,
+        SessionId: request.sessionId ?? null,
+        SystemPrompt: request.systemPrompt ?? null
+      }),
+    })
   }
+
 }
 
 export const apiClient = new ApiClient(API_BASE_URL)
@@ -160,3 +171,4 @@ export const getAuthToken = (): string | null => {
   }
   return null
 }
+

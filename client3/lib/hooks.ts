@@ -102,8 +102,14 @@ export const useRemoveFromFavorites = () => {
 }
 
 // Chat hooks
-export const useSendChatMessage = () => {
+/*export const useSendChatMessage = () => {
   return useMutation({
     mutationFn: (request: ChatRequest) => apiClient.sendChatMessage(request),
+  })
+}*/
+export const useSendChatMessage = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (msg: ChatRequest) => apiClient.sendChatMessage(msg),
   })
 }
