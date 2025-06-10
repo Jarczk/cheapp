@@ -47,6 +47,13 @@ export interface Favorite {
   product?: Product
 }
 
+export interface SearchHistoryItem {
+  id: string
+  query: string
+  searchedAt: string
+  resultCount: number
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'

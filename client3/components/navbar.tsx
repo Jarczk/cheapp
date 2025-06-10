@@ -6,8 +6,8 @@ import { Search, Heart, User, LogOut, ShoppingBag, MessageCircle } from 'lucide-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/auth'
-import { useLogout } from '@/lib/hooks'
-import { useState } from 'react'
+import { useLogout, useSearchHistory } from '@/lib/hooks'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 
 export function Navbar() {
@@ -15,11 +15,39 @@ export function Navbar() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const logout = useLogout()
   const [searchQuery, setSearchQuery] = useState('')
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [highlightIndex, setHighlightIndex] = useState(-1)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const { data: history = [] } = useSearchHistory(historyOpen)
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       router.push(`/products?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!historyOpen || history.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlightIndex((prev) => (prev + 1) % history.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlightIndex((prev) => (prev - 1 + history.length) % history.length)
+    } else if (e.key === 'Enter' && highlightIndex >= 0) {
+      e.preventDefault()
+      const item = history[highlightIndex]
+      setSearchQuery(item.query)
+      router.push(`/products?q=${encodeURIComponent(item.query)}`)
+      setHistoryOpen(false)
+      setHighlightIndex(-1)
+    }
+  }
+
+  const handleBlur = (e: React.FocusEvent<HTMLFormElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setHistoryOpen(false)
+      setHighlightIndex(-1)
     }
   }
 
@@ -42,16 +70,37 @@ export function Navbar() {
           </Link>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8" onBlur={handleBlur}>
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
+                ref={inputRef}
                 type="search"
                 placeholder="Search for products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setHistoryOpen(true)}
+                onKeyDown={handleKeyDown}
                 className="pl-10 pr-4"
               />
+              {historyOpen && history.length > 0 && (
+                <ul className="absolute z-50 mt-1 w-full rounded-md border bg-white shadow">
+                  {history.map((item, idx) => (
+                    <li
+                      key={item.id}
+                      onMouseDown={() => {
+                        setSearchQuery(item.query)
+                        router.push(`/products?q=${encodeURIComponent(item.query)}`)
+                        setHistoryOpen(false)
+                        setHighlightIndex(-1)
+                      }}
+                      className={`px-3 py-1 cursor-pointer ${highlightIndex === idx ? 'bg-muted' : ''}`}
+                    >
+                      {item.query}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </form>
 
@@ -119,16 +168,37 @@ export function Navbar() {
 
         {/* Mobile Search */}
         <div className="md:hidden pb-4">
-          <form onSubmit={handleSearch}>
+          <form onSubmit={handleSearch} onBlur={handleBlur}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
+                ref={inputRef}
                 type="search"
                 placeholder="Search for products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setHistoryOpen(true)}
+                onKeyDown={handleKeyDown}
                 className="pl-10 pr-4"
               />
+              {historyOpen && history.length > 0 && (
+                <ul className="absolute z-50 mt-1 w-full rounded-md border bg-white shadow">
+                  {history.map((item, idx) => (
+                    <li
+                      key={item.id}
+                      onMouseDown={() => {
+                        setSearchQuery(item.query)
+                        router.push(`/products?q=${encodeURIComponent(item.query)}`)
+                        setHistoryOpen(false)
+                        setHighlightIndex(-1)
+                      }}
+                      className={`px-3 py-1 cursor-pointer ${highlightIndex === idx ? 'bg-muted' : ''}`}
+                    >
+                      {item.query}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </form>
         </div>

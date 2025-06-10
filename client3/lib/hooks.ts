@@ -68,6 +68,16 @@ export const useProduct = (id: string) => {
   })
 }
 
+export const useSearchHistory = (enabled: boolean = true, limit: number = 10) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  return useQuery({
+    queryKey: ['searchHistory', limit],
+    queryFn: () => apiClient.getSearchHistory(limit),
+    enabled: enabled && isAuthenticated,
+    staleTime: 0,
+  })
+}
+
 // Favorites hooks
 export const useFavorites = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
