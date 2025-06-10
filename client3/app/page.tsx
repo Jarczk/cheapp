@@ -104,7 +104,7 @@ export default function HomePage() {
                 setSearchQuery(term)
                 router.push(`/products?q=${encodeURIComponent(term)}`)
               }}
-              className="text-xs"
+              className="text-xs -translate-y-[8px] relative"
             >
               {term}
             </Button>
