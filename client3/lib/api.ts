@@ -1,4 +1,4 @@
-import { ApiError, AuthResponse, ChatRequest, ChatResponse, Favorite, LoginRequest, Product, RegisterRequest, SearchResponse, User } from '@/types/api'
+import { ApiError, AuthResponse, ChatMessage, ChatRequest, ChatResponse, Favorite, LoginRequest, Product, RegisterRequest, SearchResponse, User } from '@/types/api'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5166/api'
 
@@ -137,7 +137,7 @@ class ApiClient {
       }),
     })
   }*/
-  async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
+  /*async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
     return this.request<ChatResponse>('/assistant/ask', {
       method: 'POST',
       body: JSON.stringify({
@@ -146,6 +146,21 @@ class ApiClient {
         SystemPrompt: request.systemPrompt ?? null
       }),
     })
+  }*/
+  async sendChatMessage(req: ChatRequest): Promise<ChatResponse> {
+    // adapt casing to your Swagger – below is camelCase
+    return this.request<ChatResponse>('/assistant/ask', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt:       req.message,
+        sessionId:    req.sessionId ?? null,
+        systemPrompt: req.systemPrompt ?? null,
+      }),
+    })
+  }
+  
+  async getChatHistory(sessionId: string) {
+    return this.request<ChatMessage[]>(`/assistant/session/${sessionId}`)
   }
 
 }

@@ -61,7 +61,6 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse {
-  response: string
   answer: string
   sessionId: string
 }
