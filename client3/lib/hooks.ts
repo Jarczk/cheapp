@@ -166,9 +166,22 @@ export const useRemoveFromFavorites = () => {
     mutationFn: (request: ChatRequest) => apiClient.sendChatMessage(request),
   })
 }*/
-export const useSendChatMessage = () => {
+/*export const useSendChatMessage = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (msg: ChatRequest) => apiClient.sendChatMessage(msg),
   })
-}
+}*/
+
+export const useSendChatMessage = () =>
+  useMutation({
+    mutationFn: (payload: ChatRequest) => apiClient.sendChatMessage(payload),
+  })
+
+export const useChatHistory = (sessionId?: string) =>
+  useQuery({
+    queryKey: ['chat', sessionId],
+    queryFn: () => apiClient.getChatHistory(sessionId!),
+    enabled: !!sessionId,           // run only if we already have an id
+    staleTime: 0,
+  })
