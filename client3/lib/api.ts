@@ -1,4 +1,4 @@
-import { ApiError, AuthResponse, ChatMessage, ChatRequest, ChatResponse, Favorite, LoginRequest, Product, RegisterRequest, SearchResponse, User } from '@/types/api'
+import { ApiError, AuthResponse, ChatMessage, ChatRequest, ChatResponse, Favorite, LoginRequest, Product, RegisterRequest, SearchHistoryItem, SearchResponse, User } from '@/types/api'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5166/api'
 
@@ -107,6 +107,10 @@ class ApiClient {
     return this.request<Product>(`/products/${id}`)
   }
 
+  async getSearchHistory(limit: number = 10): Promise<SearchHistoryItem[]> {
+    return this.request<SearchHistoryItem[]>(`/searchhistory?limit=${limit}`)
+  }
+  
   // Favorites endpoints
   async getFavorites(): Promise<Favorite[]> {
     return this.request<Favorite[]>('/favorites')
