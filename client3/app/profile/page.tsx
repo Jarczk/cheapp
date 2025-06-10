@@ -14,7 +14,7 @@ import Link from 'next/link'
 export default function ProfilePage() {
   const router = useRouter()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const { data: user, isLoading: userLoading } = useCurrentUser()
+  const { data: user,  isLoading: userLoading } = useCurrentUser()
   const { data: favorites = [] } = useFavorites()
   const logout = useLogout()
 
@@ -86,7 +86,7 @@ export default function ProfilePage() {
                       <User className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="text-sm text-muted-foreground">User ID</p>
-                        <p className="font-medium font-mono text-sm">{user?.id}</p>
+                        <p className="font-medium font-mono text-sm">{user?.uid}</p>
                       </div>
                     </div>
                   </>

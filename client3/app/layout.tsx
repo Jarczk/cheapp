@@ -25,7 +25,7 @@ export default function RootLayout({
       },
     },
   }))
-
+  
   const initialize = useAuthStore((state) => state.initialize)
 
   useEffect(() => {

@@ -79,6 +79,17 @@ export const useFavorites = () => {
   })
 }
 
+export const useFavoritesAll = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  console.log("refresh danych")
+  return useQuery({
+    queryKey: ['favorites/full'],
+    queryFn: () => apiClient.getFavoritesAll(),
+    enabled: isAuthenticated,
+    staleTime: 0,
+  })
+}
+
 export const useAddToFavorites = () => {
   const queryClient = useQueryClient()
   

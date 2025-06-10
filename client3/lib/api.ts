@@ -109,9 +109,15 @@ class ApiClient {
 
   // Favorites endpoints
   async getFavorites(): Promise<Favorite[]> {
+    console.log("getFavorites")
     return this.request<Favorite[]>('/favorites')
   }
 
+  async getFavoritesAll(): Promise<Favorite[]> {
+    console.log("getAll")
+    return await this.request<Favorite[]>('/favorites/full')
+  }
+  
   async addToFavorites(productId: string): Promise<void> {
     return this.request<void>('/favorites', {
       method: 'POST',
