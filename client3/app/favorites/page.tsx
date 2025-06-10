@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductGrid } from '@/components/product-grid'
-import { useFavorites } from '@/lib/hooks'
+import { useFavoritesAll } from '@/lib/hooks'
 import { useAuthStore } from '@/store/auth'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -13,8 +13,9 @@ import Link from 'next/link'
 export default function FavoritesPage() {
   const router = useRouter()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const { data: favorites = [], isLoading, error } = useFavorites()
+  const { data: favorites = [], isLoading, error } = useFavoritesAll()
 
+  console.log(favorites)
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/auth/login')
@@ -24,8 +25,6 @@ export default function FavoritesPage() {
   if (!isAuthenticated) {
     return null // Will redirect
   }
-
-  const products = favorites.map(fav => fav.product).filter(Boolean) as any[]
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -82,14 +81,14 @@ export default function FavoritesPage() {
         )}
 
         {/* Favorites Grid */}
-        {!isLoading && !error && products.length > 0 && (
+        {!isLoading && !error && favorites.length > 0 && (
           <div>
             <div className="mb-6">
               <p className="text-muted-foreground">
                 {favorites.length} {favorites.length === 1 ? 'favorite' : 'favorites'}
               </p>
             </div>
-            <ProductGrid products={products} />
+            <ProductGrid products={favorites} />
           </div>
         )}
       </motion.div>
