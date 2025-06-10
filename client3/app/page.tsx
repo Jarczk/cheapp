@@ -95,7 +95,7 @@ export default function HomePage() {
           className="flex flex-wrap justify-center gap-2 mb-16"
         >
           <span className="text-sm text-muted-foreground mr-2">Popular searches:</span>
-          {['iPhone', 'Laptop', 'Headphones', 'Gaming Chair', 'Smart Watch'].map((term) => (
+          {['iPhone', 'Laptop', 'Fiat'].map((term) => (
             <Button
               key={term}
               variant="outline"

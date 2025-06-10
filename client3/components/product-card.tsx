@@ -8,7 +8,6 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Product } from '@/types/api'
 import { formatPrice, truncateText } from '@/lib/utils'
 import { useAddToFavorites, useRemoveFromFavorites, useFavorites } from '@/lib/hooks'
-import { useFavoritesAll } from '@/lib/hooks'
 import { useAuthStore } from '@/store/auth'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
@@ -59,7 +58,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           <div className="relative aspect-square overflow-hidden">
             {!imageError ? (
               <Image
-                src={`https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center`}
+                src={product.imageUrl || `https://nftcalendar.io/storage/uploads/2022/02/21/image-not-found_0221202211372462137974b6c1a.png`}
                 alt={product.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
