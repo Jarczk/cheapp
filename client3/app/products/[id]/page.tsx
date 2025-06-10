@@ -15,10 +15,9 @@ import Link from 'next/link'
 
 export default function ProductDetailPage() {
   const params = useParams()
-  const productId = params.id as string
+  const productId = decodeURIComponent(params.id as string)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const [imageError, setImageError] = useState(false)
-
   const { data: product, isLoading, error } = useProduct(productId)
   const { data: favorites } = useFavorites()
   const addToFavorites = useAddToFavorites()

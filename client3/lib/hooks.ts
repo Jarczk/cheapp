@@ -91,7 +91,6 @@ export const useFavorites = () => {
 
 export const useFavoritesAll = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  console.log("refresh danych")
   return useQuery({
     queryKey: ['favorites/full'],
     queryFn: () => apiClient.getFavoritesAll(),
@@ -102,22 +101,71 @@ export const useFavoritesAll = () => {
 
 export const useAddToFavorites = () => {
   const queryClient = useQueryClient()
-  
   return useMutation({
     mutationFn: (productId: string) => apiClient.addToFavorites(productId),
-    onSuccess: () => {
+    onMutate: async (productId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['favorites'] })
+
+      const previousFavorites = queryClient.getQueryData<Favorite[]>(['favorites'])
+
+      const optimisticFavorite: Favorite = {
+        id: `temp-${productId}`,
+        productId,
+        userId: '',
+        createdAt: new Date().toISOString(),
+      }
+
+      queryClient.setQueryData<Favorite[]>(['favorites'], (old = []) => [
+        ...old,
+        optimisticFavorite,
+      ])
+
+      return { previousFavorites }
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(['favorites'], context.previousFavorites)
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['favorites'] })
+      queryClient.invalidateQueries({ queryKey: ['favorites/full'] })
     },
   })
 }
 
 export const useRemoveFromFavorites = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: (productId: string) => apiClient.removeFromFavorites(productId),
-    onSuccess: () => {
+    onMutate: async (productId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['favorites'] })
+      await queryClient.cancelQueries({ queryKey: ['favorites/full'] })
+
+      const previousFavorites = queryClient.getQueryData<Favorite[]>(['favorites'])
+      const previousFull = queryClient.getQueryData<Favorite[]>(['favorites/full'])
+
+      queryClient.setQueryData<Favorite[]>(['favorites'], (old = []) =>
+        old.filter((fav) => fav.productId !== productId)
+      )
+      queryClient.setQueryData<Favorite[]>(['favorites/full'], (old = []) =>
+        old.filter((fav) => fav.productId !== productId)
+      )
+
+      return { previousFavorites, previousFull }
+    },
+    onError: (_err, _productId, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(['favorites'], context.previousFavorites)
+      }
+      if (context?.previousFull) {
+        queryClient.setQueryData(['favorites/full'], context.previousFull)
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['favorites'] })
+      queryClient.invalidateQueries({ queryKey: ['favorites/full'] })
     },
   })
 }
