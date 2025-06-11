@@ -195,36 +195,6 @@ app.UseCors(builder => builder
     .AllowAnyMethod()
     .AllowAnyHeader());
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-    var roles = new[] { "User", "Admin" };
-
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new ApplicationRole { Name = role });
-        }
-    }
-}
-
-//remove all from mongoDB
-// using (var scope = app.Services.CreateScope())
-// {
-//     try
-//     {
-//         var mongoClient = scope.ServiceProvider.GetRequiredService<IMongoClient>();
-//         var mongoOptions = scope.ServiceProvider.GetRequiredService<IOptions<MongoOptions>>().Value;
-//         await mongoClient.DropDatabaseAsync(mongoOptions.Database);
-//         Console.WriteLine("Database cleared successfully");
-//     }
-//     catch (Exception ex)
-//     {
-//         Console.WriteLine($"Error clearing database: {ex.Message}");
-//     }
-// }
-
 app.Run();
 
 public record JwtOptions

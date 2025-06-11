@@ -98,6 +98,14 @@ class ApiClient {
     return this.request<User>('/auth/whoami')
   }
 
+  async getUsers(): Promise<User[]> {
+    return this.request<User[]>('/users')
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    return this.request<void>(`/users/${id}`, { method: 'DELETE' })
+  }
+  
   // Products endpoints
   async searchProducts(query: string, page: number = 1): Promise<Product[]> {
     return this.request<Product[]>(`/offers?q=${encodeURIComponent(query)}&page=${page}`)

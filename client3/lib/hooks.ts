@@ -50,6 +50,23 @@ export const useCurrentUser = () => {
   })
 }
 
+export const useUsers = () =>
+  useQuery({
+    queryKey: ['users'],
+    queryFn: () => apiClient.getUsers(),
+    staleTime: 0,
+  })
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => apiClient.deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+}
+
 // Products hooks
 export const useSearchProducts = (query: string, enabled: boolean = true) => {
   return useQuery({

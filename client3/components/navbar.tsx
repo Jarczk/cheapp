@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Search, Heart, User, LogOut, ShoppingBag, MessageCircle } from 'lucide-react'
+import { Search, Heart, User, LogOut, ShoppingBag, MessageCircle, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/auth'
-import { useLogout, useSearchHistory } from '@/lib/hooks'
+import { useLogout, useSearchHistory, useCurrentUser } from '@/lib/hooks'
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 
@@ -14,6 +14,8 @@ export function Navbar() {
   const router = useRouter()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const logout = useLogout()
+  const { data: currentUser } = useCurrentUser()
+  const isAdmin = currentUser?.roles?.includes('Admin')
   const [searchQuery, setSearchQuery] = useState('')
   const [historyOpen, setHistoryOpen] = useState(false)
   const [highlightIndex, setHighlightIndex] = useState(-1)
@@ -114,6 +116,14 @@ export function Navbar() {
                     Favorites
                   </Button>
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button variant="ghost" size="sm" className="hidden sm:flex">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
                 <Link href="/profile">
                   <Button variant="ghost" size="sm" className="hidden sm:flex">
                     <User className="h-4 w-4 mr-2" />
@@ -155,6 +165,13 @@ export function Navbar() {
                       <Heart className="h-4 w-4" />
                     </Button>
                   </Link>
+                  {isAdmin && (
+                    <Link href="/admin">
+                      <Button variant="ghost" size="icon">
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  )}
                   <Link href="/profile">
                     <Button variant="ghost" size="icon">
                       <User className="h-4 w-4" />
