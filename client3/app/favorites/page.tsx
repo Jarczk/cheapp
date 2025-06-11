@@ -15,7 +15,6 @@ export default function FavoritesPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const { data: favorites = [], isLoading, error } = useFavoritesAll()
 
-  console.log(favorites)
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/auth/login')
