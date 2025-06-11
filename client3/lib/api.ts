@@ -124,8 +124,8 @@ class ApiClient {
     return this.request<Favorite[]>('/favorites')
   }
 
-  async getFavoritesAll(): Promise<Favorite[]> {
-    return await this.request<Favorite[]>('/favorites/full')
+  async getFavoritesAll(): Promise<Product[]> {
+    return await this.request<Product[]>('/favorites/full')
   }
   
   async addToFavorites(productId: string): Promise<void> {

@@ -18,14 +18,20 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<UserDto>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
     {
-        var users = _userManager.Users.Select(u => new UserDto
-        {
-            Id = u.Id.ToString(),
-            Email = u.Email ?? string.Empty,
-            UserName = u.UserName
-        }).ToList();
+        var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+        var adminIds = adminUsers.Select(a => a.Id).ToHashSet();
+
+        var users = _userManager.Users
+            .Where(u => !adminIds.Contains(u.Id))
+            .Select(u => new UserDto
+            {
+                Id = u.Id.ToString(),
+                Email = u.Email ?? string.Empty,
+                UserName = u.UserName
+            })
+            .ToList();
         return Ok(users);
     }
 

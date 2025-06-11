@@ -15,9 +15,10 @@ import { useState } from 'react'
 interface ProductCardProps {
   product: Product
   index?: number
+  onUnfavorite?: (productId: string) => void
 }
 
-export function ProductCard({ product, index = 0 }: ProductCardProps) {
+export function ProductCard({ product, index = 0, onUnfavorite }: ProductCardProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const { data: favorites } = useFavorites()
   const addToFavorites = useAddToFavorites()
@@ -33,6 +34,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     if (!isAuthenticated) return
 
     if (isFavorited) {
+      onUnfavorite?.(product.id)
       removeFromFavorites.mutate(product.id)
     } else {
       addToFavorites.mutate(product.id)

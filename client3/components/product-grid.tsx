@@ -7,9 +7,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 interface ProductGridProps {
   products: Product[]
   isLoading?: boolean
+  onUnfavorite?: (productId: string) => void
 }
 
-export function ProductGrid({ products, isLoading }: ProductGridProps) {
+export function ProductGrid({ products, isLoading, onUnfavorite }: ProductGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -39,7 +40,12 @@ export function ProductGrid({ products, isLoading }: ProductGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product, index) => (
-        <ProductCard key={product.id} product={product} index={index}/>
+        <ProductCard
+          key={product.id}
+          product={product}
+          index={index}
+          onUnfavorite={onUnfavorite}
+        />
       ))}
     </div>
   )

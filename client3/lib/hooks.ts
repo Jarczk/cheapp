@@ -108,7 +108,7 @@ export const useFavorites = () => {
 
 export const useFavoritesAll = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  return useQuery({
+  return useQuery<Product[]>({
     queryKey: ['favorites/full'],
     queryFn: () => apiClient.getFavoritesAll(),
     enabled: isAuthenticated,

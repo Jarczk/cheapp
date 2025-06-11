@@ -113,6 +113,7 @@ namespace Cheapp.Controllers
 
             var user = await _userManager.FindByIdAsync(userId);
             var roles = user is null ? Array.Empty<string>() : await _userManager.GetRolesAsync(user);
+
             return Ok(new
             {
                 uid = userId,

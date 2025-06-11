@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductGrid } from '@/components/product-grid'
 import { useFavoritesAll } from '@/lib/hooks'
+import { Product } from '@/types/api'
 import { useAuthStore } from '@/store/auth'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -14,6 +15,17 @@ export default function FavoritesPage() {
   const router = useRouter()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const { data: favorites = [], isLoading, error } = useFavoritesAll()
+  const [visibleFavorites, setVisibleFavorites] = useState<Product[]>(favorites)
+
+  useEffect(() => {
+    setVisibleFavorites(favorites)
+  }, [favorites])
+
+  const handleUnfavorite = (productId: string) => {
+    setVisibleFavorites(prev =>
+      prev.filter((fav: any) => fav.id !== productId && fav.productId !== productId)
+    )
+  }
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -61,7 +73,7 @@ export default function FavoritesPage() {
         )}
 
         {/* Empty State */}
-        {!isLoading && !error && favorites.length === 0 && (
+        {!isLoading && !error && visibleFavorites.length === 0 && (
           <div className="text-center py-20">
             <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -80,14 +92,14 @@ export default function FavoritesPage() {
         )}
 
         {/* Favorites Grid */}
-        {!isLoading && !error && favorites.length > 0 && (
+        {!isLoading && !error && visibleFavorites.length > 0 && (
           <div>
             <div className="mb-6">
               <p className="text-muted-foreground">
-                {favorites.length} {favorites.length === 1 ? 'favorite' : 'favorites'}
+                {visibleFavorites.length} {visibleFavorites.length === 1 ? 'favorite' : 'favorites'}
               </p>
             </div>
-            <ProductGrid products={favorites} />
+            <ProductGrid products={visibleFavorites} onUnfavorite={handleUnfavorite} />
           </div>
         )}
       </motion.div>
