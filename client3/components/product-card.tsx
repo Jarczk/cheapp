@@ -60,7 +60,7 @@ export function ProductCard({ product, index = 0, onUnfavorite }: ProductCardPro
           <div className="relative aspect-square overflow-hidden">
             {!imageError ? (
               <Image
-                src={product.imageUrl || `https://nftcalendar.io/storage/uploads/2022/02/21/image-not-found_0221202211372462137974b6c1a.png`}
+                src={product.imageUrl || ""}
                 alt={product.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"

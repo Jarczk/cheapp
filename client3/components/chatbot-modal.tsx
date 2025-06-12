@@ -111,9 +111,8 @@ export function ChatbotModal() {
                     className={`max-w-[80%] rounded-lg px-3 py-2 whitespace-pre-wrap ${
                       m.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
                     }`}
-                  >
-                    {m.content}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: m.content }}
+                  ></div>
                 </motion.div>
               ))}
               {isPending && (

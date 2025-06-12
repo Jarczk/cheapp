@@ -25,7 +25,21 @@ public class EbayClient : IEbayClient
         var resp = await _http.GetAsync($"{endpoint}?q={Uri.EscapeDataString(query)}&limit=25", ct);
         resp.EnsureSuccessStatusCode();
         var data = await resp.Content.ReadFromJsonAsync<EbayResp>(cancellationToken: ct);
-        return data?.ItemSummaries?.Select(ToOffer) ?? Enumerable.Empty<Offer>();
+        var offers = data?.ItemSummaries?.Select(ToOffer).ToList() ?? new List<Offer>();
+
+        var tasks = offers
+            .Where(o => string.IsNullOrEmpty(o.ImageUrl))
+            .Select(async o =>
+            {
+                var full = await GetByIdAsync(o.Id, ct);
+                if (full is not null)
+                {
+                    o.ImageUrl = full.ImageUrl;
+                }
+            });
+
+        await Task.WhenAll(tasks);
+        return offers;
     }
 
     public async Task<Offer?> GetByIdAsync(string itemId, CancellationToken ct = default)

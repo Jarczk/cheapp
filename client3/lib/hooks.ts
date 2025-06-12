@@ -145,8 +145,6 @@ export const useAddToFavorites = () => {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] })
-      queryClient.invalidateQueries({ queryKey: ['favorites/full'] })
     },
   })
 }
@@ -181,8 +179,6 @@ export const useRemoveFromFavorites = () => {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] })
-      queryClient.invalidateQueries({ queryKey: ['favorites/full'] })
     },
   })
 }
