@@ -19,19 +19,19 @@ export function ChatbotModal() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  /* 1 —— history sync on modal open */
+  /* history sync on modal open */
   const { data: history } = useChatHistory(open ? sessionId : undefined)
   useEffect(() => {
     if (!history) return
     setMessages(history)
   }, [history])
 
-  /* 2 —— auto-scroll */
+  /* auto-scroll */
   useEffect(() => {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight)
   }, [messages])
 
-  /* 3 —— send hook */
+  /* send hook */
   const { mutateAsync: send, isPending } = useSendChatMessage()
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -54,7 +54,7 @@ export function ChatbotModal() {
         systemPrompt: sessionId ? undefined : SYSTEM_PROMPT,
       })
 
-      setSessionId(res.sessionId)                       // ← keep id
+      setSessionId(res.sessionId)
       const botMsg: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',

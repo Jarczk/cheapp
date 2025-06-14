@@ -144,27 +144,7 @@ class ApiClient {
   }
 
   // Chat endpoints
-  /*async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
-    return this.request<ChatResponse>('/assistant/ask', {
-      method: 'POST',
-      body: JSON.stringify({
-        Prompt: request.message,
-        SessionId: request.sessionId,
-      }),
-    })
-  }*/
-  /*async sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
-    return this.request<ChatResponse>('/assistant/ask', {
-      method: 'POST',
-      body: JSON.stringify({
-        Prompt:    request.message,
-        SessionId: request.sessionId ?? null,
-        SystemPrompt: request.systemPrompt ?? null
-      }),
-    })
-  }*/
   async sendChatMessage(req: ChatRequest): Promise<ChatResponse> {
-    // adapt casing to your Swagger – below is camelCase
     return this.request<ChatResponse>('/assistant/ask', {
       method: 'POST',
       body: JSON.stringify({

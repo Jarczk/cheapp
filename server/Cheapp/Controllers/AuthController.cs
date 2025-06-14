@@ -20,7 +20,7 @@ namespace Cheapp.Controllers
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
-            IOptions<JwtOptions> jwt)            // <-- tu!
+            IOptions<JwtOptions> jwt)            
         {
             _userManager = userManager;
             _jwt = jwt.Value ?? throw new InvalidOperationException("Jwt section missing");

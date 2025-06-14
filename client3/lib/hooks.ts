@@ -32,7 +32,6 @@ export const useLogout = () => {
       queryClient.clear()
     },
     onError: () => {
-      // Even if the API call fails, we should still log out locally
       logout()
       queryClient.clear()
     },
@@ -184,18 +183,6 @@ export const useRemoveFromFavorites = () => {
 }
 
 // Chat hooks
-/*export const useSendChatMessage = () => {
-  return useMutation({
-    mutationFn: (request: ChatRequest) => apiClient.sendChatMessage(request),
-  })
-}*/
-/*export const useSendChatMessage = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (msg: ChatRequest) => apiClient.sendChatMessage(msg),
-  })
-}*/
-
 export const useSendChatMessage = () =>
   useMutation({
     mutationFn: (payload: ChatRequest) => apiClient.sendChatMessage(payload),
