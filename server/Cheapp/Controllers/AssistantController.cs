@@ -31,7 +31,7 @@ public class AssistantController : ControllerBase
 
         if (TryExtractQuery(dto.Prompt, out var query))
         {
-            var link = $"http://localhost:3000/products?q={Uri.EscapeDataString(query)}";
+            var link = $"/products?q={Uri.EscapeDataString(query)}";
             var answer_ = $"Spoko! Tutaj znajdziesz oferty: <a href=\"{link}\">LINK</a>";
             await _conv.AppendAsync(sessionId, "assistant", answer_, ct);
             return Ok(new { sessionId, answer_ });
@@ -57,7 +57,7 @@ public class AssistantController : ControllerBase
         if (string.IsNullOrWhiteSpace(text))
             return false;
 
-        var match = Regex.Match(text, @"^\s*(?:chce|chcê|szukam)\s+(.+)$", RegexOptions.IgnoreCase);
+        var match = Regex.Match(text, @"^\s*(?:chce|chcï¿½|szukam)\s+(.+)$", RegexOptions.IgnoreCase);
         if (match.Success)
         {
             query = match.Groups[1].Value.Trim();
