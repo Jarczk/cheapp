@@ -62,7 +62,19 @@ Aplikacja korzysta z JWT do autoryzacji – klucz i parametry tokenu konfigurowa
 ### Najważniejsze kontrolery
  
 1. **AuthController** – odpowiada za rejestrację, logowanie oraz zwracanie informacji o aktualnie zalogowanym użytkowniku. Dane użytkowników są przechowywane w kolekcji `Users` w MongoDB przy użyciu bibliotek `AspNetCore.Identity.Mongo`.
-   ![image](https://github.com/user-attachments/assets/37e97af0-1cab-41f6-a761-5e407e2703b4)
+
+Poniżej przykłąt tworzenia konta użytkownika:
+
+![image](https://github.com/user-attachments/assets/37e97af0-1cab-41f6-a761-5e407e2703b4)
+
+Przykład rekordu z kolekcji 'Users' po stworzeniu konta:
+
+![image](https://github.com/user-attachments/assets/7302ad33-251c-48f3-b0eb-38cf2e133f29)
+
+Po stworzeniu konta uzytkownik moze sie zalogować:
+
+![image](https://github.com/user-attachments/assets/b6dfb6e8-fd6b-421a-a7fa-bef0688e4d71)
+
 
 3. **OffersController** – udostępnia endpoint `GET /api/offers` do wyszukiwania ofert w serwisie eBay. Zwraca posortowaną listę produktów według ceny, a wynik zapisywany jest w historii wyszukiwań danego użytkownika.
 4. **FavoritesController** – pozwala dodawać i usuwać produkty z listy ulubionych, a także pobierać listę ulubionych ofert. Każda operacja powiązana jest z identyfikatorem użytkownika pobranym z tokena JWT.
