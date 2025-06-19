@@ -62,10 +62,12 @@ Aplikacja korzysta z JWT do autoryzacji – klucz i parametry tokenu konfigurowa
 ### Najważniejsze kontrolery
  
 1. **AuthController** – odpowiada za rejestrację, logowanie oraz zwracanie informacji o aktualnie zalogowanym użytkowniku. Dane użytkowników są przechowywane w kolekcji `Users` w MongoDB przy użyciu bibliotek `AspNetCore.Identity.Mongo`.
-2. **OffersController** – udostępnia endpoint `GET /api/offers` do wyszukiwania ofert w serwisie eBay. Zwraca posortowaną listę produktów według ceny, a wynik zapisywany jest w historii wyszukiwań danego użytkownika.
-3. **FavoritesController** – pozwala dodawać i usuwać produkty z listy ulubionych, a także pobierać listę ulubionych ofert. Każda operacja powiązana jest z identyfikatorem użytkownika pobranym z tokena JWT.
-4. **SearchHistoryController** – umożliwia pobieranie i czyszczenie historii wyszukiwań. Dla jednego użytkownika przechowywanych jest maksymalnie 50 ostatnich wyszukiwań.
-5. **ProductsController** – udostępnia endpoint do pobierania informacji o pojedynczym produkcie na podstawie jego identyfikatora.
+   ![image](https://github.com/user-attachments/assets/37e97af0-1cab-41f6-a761-5e407e2703b4)
+
+3. **OffersController** – udostępnia endpoint `GET /api/offers` do wyszukiwania ofert w serwisie eBay. Zwraca posortowaną listę produktów według ceny, a wynik zapisywany jest w historii wyszukiwań danego użytkownika.
+4. **FavoritesController** – pozwala dodawać i usuwać produkty z listy ulubionych, a także pobierać listę ulubionych ofert. Każda operacja powiązana jest z identyfikatorem użytkownika pobranym z tokena JWT.
+5. **SearchHistoryController** – umożliwia pobieranie i czyszczenie historii wyszukiwań. Dla jednego użytkownika przechowywanych jest maksymalnie 50 ostatnich wyszukiwań.
+6. **ProductsController** – udostępnia endpoint do pobierania informacji o pojedynczym produkcie na podstawie jego identyfikatora.
  
 ### Warstwa usług
  
