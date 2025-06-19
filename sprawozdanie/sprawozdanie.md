@@ -63,56 +63,56 @@ Aplikacja korzysta z JWT do autoryzacji – klucz i parametry tokenu konfigurowa
  
 1. **AuthController** – odpowiada za rejestrację, logowanie oraz zwracanie informacji o aktualnie zalogowanym użytkowniku. Dane użytkowników są przechowywane w kolekcji `Users` w MongoDB przy użyciu bibliotek `AspNetCore.Identity.Mongo`.
 
-Poniżej przykłąd tworzenia konta użytkownika:
+  Poniżej przykład tworzenia konta użytkownika:
 
-![image](https://github.com/user-attachments/assets/37e97af0-1cab-41f6-a761-5e407e2703b4)
+  ![image](https://github.com/user-attachments/assets/37e97af0-1cab-41f6-a761-5e407e2703b4)
 
-Przykład rekordu z kolekcji 'Users' po stworzeniu konta:
+  Przykład rekordu z kolekcji 'Users' po stworzeniu konta:
 
-![image](https://github.com/user-attachments/assets/7302ad33-251c-48f3-b0eb-38cf2e133f29)
+  ![image](https://github.com/user-attachments/assets/7302ad33-251c-48f3-b0eb-38cf2e133f29)
 
-Po stworzeniu konta uzytkownik moze sie zalogować:
+  Po stworzeniu konta użytkownik może się zalogować:
 
-![image](https://github.com/user-attachments/assets/b6dfb6e8-fd6b-421a-a7fa-bef0688e4d71)
+  ![image](https://github.com/user-attachments/assets/b6dfb6e8-fd6b-421a-a7fa-bef0688e4d71)
 
 
 3. **OffersController** – udostępnia endpoint `GET /api/offers` do wyszukiwania ofert w serwisie eBay. Zwraca posortowaną listę produktów według ceny, a wynik zapisywany jest w historii wyszukiwań danego użytkownika.
 
-Przykłąd wyszukiwania produktu:
-
-![image](https://github.com/user-attachments/assets/eaee4815-8665-4518-a7f7-fb54edef158e)
-
-Zwrócona lista posortowanych produktów:
-
-![image](https://github.com/user-attachments/assets/24075953-2a57-41b0-b1ab-3604b7a527cd)
+  Przykład wyszukiwania produktu:
+  
+  ![image](https://github.com/user-attachments/assets/eaee4815-8665-4518-a7f7-fb54edef158e)
+  
+  Zwrócona lista posortowanych produktów:
+  
+  ![image](https://github.com/user-attachments/assets/24075953-2a57-41b0-b1ab-3604b7a527cd)
 
 
 5. **FavoritesController** – pozwala dodawać i usuwać produkty z listy ulubionych, a także pobierać listę ulubionych ofert. Każda operacja powiązana jest z identyfikatorem użytkownika pobranym z tokena JWT.
 
-Po dodaniu produktu do ulubionych zostaje on oznaczony:
-
-![image](https://github.com/user-attachments/assets/936e8453-3eab-4422-a9da-ca49946890f9)
-
-Można go następnie znaleźć w zakładce 'Favorites':
-
-![image](https://github.com/user-attachments/assets/b2611b17-0419-48de-829f-561142daecb8)
-
-Przykład rekordu z kolekcji 'Favorites' z MongoDBCompass:
-
-![image](https://github.com/user-attachments/assets/7d58c16d-7a8e-4fb4-9853-f02b4c012e00)
+  Po dodaniu produktu do ulubionych zostaje on oznaczony:
+  
+  ![image](https://github.com/user-attachments/assets/936e8453-3eab-4422-a9da-ca49946890f9)
+  
+  Można go następnie znaleźć w zakładce 'Favorites':
+  
+  ![image](https://github.com/user-attachments/assets/b2611b17-0419-48de-829f-561142daecb8)
+  
+  Przykład rekordu z kolekcji 'Favorites' z MongoDBCompass:
+  
+  ![image](https://github.com/user-attachments/assets/7d58c16d-7a8e-4fb4-9853-f02b4c012e00)
 
 
 7. **SearchHistoryController** – umożliwia pobieranie i czyszczenie historii wyszukiwań. Dla jednego użytkownika przechowywanych jest maksymalnie 50 ostatnich wyszukiwań.
 
-Przykłąd zapisanej historii wyszukiwania:
-
-![image](https://github.com/user-attachments/assets/5a6b9c14-b8ea-4978-9699-f1ac9bc4b762)
+  Przykład zapisanej historii wyszukiwania:
+  
+  ![image](https://github.com/user-attachments/assets/5a6b9c14-b8ea-4978-9699-f1ac9bc4b762)
 
 9. **ProductsController** – udostępnia endpoint do pobierania informacji o pojedynczym produkcie na podstawie jego identyfikatora.
 
-Przykład wyświetlenia pojedyńczego produktu:
-
-![image](https://github.com/user-attachments/assets/b4d9357a-e4ce-4473-ac1b-81453b81946b)
+  Przykład wyświetlenia pojedyńczego produktu:
+  
+  ![image](https://github.com/user-attachments/assets/b4d9357a-e4ce-4473-ac1b-81453b81946b)
 
 ### Warstwa usług
  
@@ -206,15 +206,15 @@ export const useAuthStore = create<AuthState>()(
  
 - Strona główna (`app/page.tsx`) zawiera formularz wyszukiwania i przedstawia kluczowe funkcje aplikacji w formie kart z ikonami.
 
-![image](https://github.com/user-attachments/assets/6a19b7de-d7c4-469c-8e2a-4dba59efb328)
+  ![image](https://github.com/user-attachments/assets/6a19b7de-d7c4-469c-8e2a-4dba59efb328)
 
 - Widok produktów (`app/products`) pobiera dane z backendu i wyświetla je w siatce kart. Można tutaj dodać wybrany produkt do ulubionych.
 
-![image](https://github.com/user-attachments/assets/f71d2668-9feb-42cc-aba6-54e41f77939f)
+  ![image](https://github.com/user-attachments/assets/f71d2668-9feb-42cc-aba6-54e41f77939f)
 
 - Sekcja profilu (`app/profile`) umożliwia przeglądnięcie historii wyszukiwań pobieranej z API `SearchHistoryController` oraz zarządzanie ulubionymi produktami.
 
-![image](https://github.com/user-attachments/assets/1b9b4886-89e9-44ce-b394-444c3e171f6d)
+  ![image](https://github.com/user-attachments/assets/1b9b4886-89e9-44ce-b394-444c3e171f6d)
 
 ### Stylowanie i interakcje
  
@@ -229,10 +229,10 @@ Dane przechowywane są w dokumentowej bazie MongoDB. Główne kolekcje to:
 - `searchhistory` – zapisuje historię wyszukiwań wraz z czasem i liczbą wyników.
  
 Operacje na bazie wykonuje `MongoFavoritesService` oraz `SearchHistoryService`. Oba serwisy inicjalizują indeksy w kolekcjach (np. unikalne połączenie `UserId + ProductId` w `Favorites`), co zwiększa szybkość zapytań i zapobiega duplikatom.
-
-Przykład struktury danych:
-
-![image](https://github.com/user-attachments/assets/95b6841b-10b1-419e-a048-ab9fd518149f)
+  
+  Przykład struktury danych:
+  
+  ![image](https://github.com/user-attachments/assets/95b6841b-10b1-419e-a048-ab9fd518149f)
 
 ### Przykładowy zapis w kolekcji `Favorites`
  
