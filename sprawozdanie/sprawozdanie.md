@@ -265,3 +265,8 @@ Operacje na bazie wykonuje `MongoFavoritesService` oraz `SearchHistoryService`. 
  
 Aplikacja "Cheapp" stanowi kompletny system agregujący oferty z zewnętrznych serwisów i udostępniający je użytkownikom w przyjaznej formie. Backend w .NET zajmuje się obsługą logiki biznesowej, autoryzacji oraz komunikacji z MongoDB. Frontend w Next.js zapewnia czytelny interfejs użytkownika i umożliwia wygodne korzystanie z funkcji aplikacji. Dzięki wykorzystaniu bazy MongoDB możliwe jest łatwe skalowanie oraz przechowywanie danych w elastyczny sposób.
  
+## Rozkład pracy
+
+Jarosław Fąfara - inicjalizacja projektu, architektura, backend, frontend
+Waldemar Świergosz - architektura, backend, poprawki błędów, dokumentacja
+Piotr Światłoń - frontend, backend, poprawki błędów
